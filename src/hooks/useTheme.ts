@@ -41,15 +41,7 @@ export function useTheme() {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => {
-      if (isMikuUnlocked) {
-        if (prev === 'light') return 'dark';
-        if (prev === 'dark') return 'miku';
-        return 'light';
-      } else {
-        return prev === 'dark' ? 'light' : 'dark';
-      }
-    });
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   // Mモード発動トリガー
