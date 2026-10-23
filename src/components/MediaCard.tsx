@@ -10,7 +10,8 @@ import {
   FileText,
   LogOut,
   RotateCcw,
-  Tag
+  Tag,
+  History
 } from 'lucide-react';
 import type { MediaItem, MediaType, FormatStatus } from '../types/media';
 
@@ -20,6 +21,7 @@ interface MediaCardProps {
   onOpenContentEdit: (item: MediaItem) => void;
   onOpenQrView: (item: MediaItem) => void;
   onOpenEdit: (item: MediaItem) => void;
+  onOpenHistory: (item: MediaItem) => void;
 }
 
 export const MediaCard: React.FC<MediaCardProps> = ({
@@ -28,6 +30,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   onOpenContentEdit,
   onOpenQrView,
   onOpenEdit,
+  onOpenHistory,
 }) => {
   // メディアアイコン
   const getTypeBadge = (type: MediaType) => {
@@ -216,6 +219,13 @@ export const MediaCard: React.FC<MediaCardProps> = ({
             className="p-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-transparent transition shadow-2xs"
           >
             <Edit className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onOpenHistory(item)}
+            title="この機材の持ち出し履歴"
+            className="p-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-transparent transition shadow-2xs"
+          >
+            <History className="w-4 h-4" />
           </button>
         </div>
 

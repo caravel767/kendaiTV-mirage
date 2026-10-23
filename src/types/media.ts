@@ -21,6 +21,22 @@ export interface MediaItem {
   updatedAt: number; // 最終更新タイムスタンプ
 }
 
+export type LogAction = 'borrow' | 'return';
+
+export interface MediaLog {
+  id: string;
+  mediaId: string;
+  mediaCode: string;
+  mediaName: string;
+  action: LogAction;
+  borrower: string; // 持ち出した部員 / 返却した部員
+  project?: string; // 企画・用途
+  returnDueDate?: string; // 返却予定日
+  formattedOnReturn?: boolean; // 返却時にフォーマットされたか
+  timestamp: number; // 記録日時
+  notes?: string;
+}
+
 export interface FirebaseConfig {
   apiKey: string;
   authDomain: string;

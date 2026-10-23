@@ -12,14 +12,17 @@ import {
   Wifi,
   WifiOff,
   Sun,
-  Moon
+  Moon,
+  History
 } from 'lucide-react';
-import type { MediaItem } from './types/media';
+import type { MediaItem, MediaLog } from './types/media';
 import {
   subscribeToMedia,
+  subscribeToLogs,
   addMediaItem,
   updateMediaItem,
   deleteMediaItem,
+  addMediaLog,
   initFirebaseService
 } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
@@ -29,11 +32,13 @@ import { ContentEditModal } from './components/ContentEditModal';
 import { BorrowReturnModal } from './components/BorrowReturnModal';
 import { QrScannerModal } from './components/QrScannerModal';
 import { QrViewModal } from './components/QrViewModal';
+import { HistoryModal } from './components/HistoryModal';
 import { SettingsModal } from './components/SettingsModal';
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const [items, setItems] = useState<MediaItem[]>([]);
+  const [logs, setLogs] = useState<MediaLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFirebaseConnected, setIsFirebaseConnected] = useState(false);
 
@@ -57,6 +62,9 @@ export default function App() {
   const [isQrViewOpen, setIsQrViewOpen] = useState(false);
   const [selectedQrItem, setSelectedQrItem] = useState<MediaItem | null>(null);
 
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyMediaCode, setHistoryMediaCode] = useState<string | null>(null);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // データ初期ロード＆リアルタイム同期
@@ -64,7 +72,7 @@ export default function App() {
     const { isFirebaseReady } = initFirebaseService();
     setIsFirebaseConnected(isFirebaseReady);
 
-    const unsubscribe = subscribeToMedia(
+    const unsubMedia = subscribeToMedia(
       (data) => {
         setItems(data);
         setLoading(false);
@@ -75,15 +83,24 @@ export default function App() {
       }
     );
 
+    const unsubLogs = subscribeToLogs(
+      (logData) => {
+        setLogs(logData);
+      },
+      (error) => {
+        console.error('Logs subscription error:', error);
+      }
+    );
+
     return () => {
-      unsubscribe();
+      unsubMedia();
+      unsubLogs();
     };
   }, []);
 
   // フィルタリング処理
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      // 検索キーワード
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesCode = item.code.toLowerCase().includes(q);
@@ -98,17 +115,14 @@ export default function App() {
         }
       }
 
-      // メディア種別フィルター
       if (selectedType !== 'ALL' && item.type !== selectedType) {
         return false;
       }
 
-      // 持ち出しステータスフィルター
       if (selectedStatus !== 'ALL' && item.status !== selectedStatus) {
         return false;
       }
 
-      // 初期化ステータスフィルター
       if (selectedFormat !== 'ALL' && item.formatStatus !== selectedFormat) {
         return false;
       }
@@ -185,13 +199,26 @@ export default function App() {
 
           {/* 右上アクションボタングループ */}
           <div className="flex items-center gap-2">
-            {/* テーマ切り替えボタン（ライト / ダーク） */}
+            {/* テーマ切り替えボタン */}
             <button
               onClick={toggleTheme}
               title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
               className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 transition"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+            </button>
+
+            {/* 持ち出し履歴ボタン */}
+            <button
+              onClick={() => {
+                setHistoryMediaCode(null);
+                setIsHistoryOpen(true);
+              }}
+              title="持ち出し・返却履歴"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition active:scale-95 shadow-2xs"
+            >
+              <History className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+              <span className="hidden sm:inline">履歴</span>
             </button>
 
             {/* QRスキャンボタン */}
@@ -399,6 +426,10 @@ export default function App() {
                     setSelectedEditItem(target);
                     setIsMediaModalOpen(true);
                   }}
+                  onOpenHistory={(target) => {
+                    setHistoryMediaCode(target.code);
+                    setIsHistoryOpen(true);
+                  }}
                 />
               ))}
             </div>
@@ -419,8 +450,20 @@ export default function App() {
           setIsBorrowModalOpen(false);
           setSelectedBorrowItem(null);
         }}
-        onConfirm={async (id, updates) => {
+        onConfirm={async (id, updates, logData) => {
           await updateMediaItem(id, updates);
+          if (selectedBorrowItem) {
+            await addMediaLog({
+              mediaId: id,
+              mediaCode: selectedBorrowItem.code,
+              mediaName: selectedBorrowItem.name,
+              action: logData.action,
+              borrower: logData.borrower,
+              project: logData.project,
+              returnDueDate: logData.returnDueDate,
+              formattedOnReturn: logData.formattedOnReturn,
+            });
+          }
         }}
       />
 
@@ -468,6 +511,16 @@ export default function App() {
           setIsQrViewOpen(false);
           setSelectedQrItem(null);
         }}
+      />
+
+      <HistoryModal
+        logs={logs}
+        isOpen={isHistoryOpen}
+        onClose={() => {
+          setIsHistoryOpen(false);
+          setHistoryMediaCode(null);
+        }}
+        filterMediaCode={historyMediaCode}
       />
 
       <SettingsModal

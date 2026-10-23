@@ -6,7 +6,17 @@ interface BorrowReturnModalProps {
   item: MediaItem | null;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (id: string, updates: Partial<MediaItem>) => Promise<void>;
+  onConfirm: (
+    id: string,
+    updates: Partial<MediaItem>,
+    logData: {
+      action: 'borrow' | 'return';
+      borrower: string;
+      project?: string;
+      returnDueDate?: string;
+      formattedOnReturn?: boolean;
+    }
+  ) => Promise<void>;
 }
 
 export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
@@ -48,15 +58,24 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
     setIsSubmitting(true);
     try {
       const today = new Date().toISOString().split('T')[0];
-      await onConfirm(item.id, {
-        status: 'borrowed',
-        borrower: borrower.trim(),
-        borrowDate: today,
-        returnDueDate: returnDueDate || '',
-        project: project.trim(),
-        formatStatus: formatStatus,
-        contentDescription: contentDescription.trim() || item.contentDescription,
-      });
+      await onConfirm(
+        item.id,
+        {
+          status: 'borrowed',
+          borrower: borrower.trim(),
+          borrowDate: today,
+          returnDueDate: returnDueDate || '',
+          project: project.trim(),
+          formatStatus: formatStatus,
+          contentDescription: contentDescription.trim() || item.contentDescription,
+        },
+        {
+          action: 'borrow',
+          borrower: borrower.trim(),
+          project: project.trim(),
+          returnDueDate: returnDueDate || '',
+        }
+      );
       onClose();
     } catch (err) {
       console.error(err);
@@ -82,7 +101,16 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
         updates.project = '';
       }
 
-      await onConfirm(item.id, updates);
+      await onConfirm(
+        item.id,
+        updates,
+        {
+          action: 'return',
+          borrower: item.borrower || '不明',
+          project: item.project || '',
+          formattedOnReturn: isFormattingOnReturn,
+        }
+      );
       onClose();
     } catch (err) {
       console.error(err);

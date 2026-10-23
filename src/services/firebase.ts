@@ -12,10 +12,48 @@ import {
   type Firestore,
   type Unsubscribe
 } from 'firebase/firestore';
-import type { MediaItem, FirebaseConfig } from '../types/media';
+import type { MediaItem, MediaLog, FirebaseConfig } from '../types/media';
 
 const STORAGE_KEY_FIREBASE_CONFIG = 'kendaitv_firebase_config';
 const STORAGE_KEY_LOCAL_MEDIA = 'kendaitv_local_media_items';
+const STORAGE_KEY_LOCAL_LOGS = 'kendaitv_local_media_logs';
+
+export const INITIAL_DEMO_LOGS: MediaLog[] = [
+  {
+    id: 'log-1',
+    mediaId: 'demo-2',
+    mediaCode: 'SD-02',
+    mediaName: 'Nextorage Gシリーズ 128GB',
+    action: 'borrow',
+    borrower: '佐藤（2年）',
+    project: '学祭PVオープニング撮影',
+    returnDueDate: '2026-10-25',
+    timestamp: Date.now() - 3600000 * 24,
+  },
+  {
+    id: 'log-2',
+    mediaId: 'demo-3',
+    mediaCode: 'SSD-01',
+    mediaName: 'SanDisk Extreme ポータブルSSD 1TB',
+    action: 'borrow',
+    borrower: '田中（3年）',
+    project: 'サークル紹介映像2026',
+    returnDueDate: '2026-10-24',
+    timestamp: Date.now() - 3600000 * 48,
+  },
+  {
+    id: 'log-3',
+    mediaId: 'demo-1',
+    mediaCode: 'SD-01',
+    mediaName: 'SanDisk Extreme PRO 128GB #1',
+    action: 'return',
+    borrower: '高橋（1年）',
+    project: '機材テスト撮影',
+    formattedOnReturn: true,
+    timestamp: Date.now() - 3600000 * 5,
+    notes: 'フォーマット完了して返却',
+  }
+];
 
 // デフォルトのサンプルデータ（初期起動時用）
 export const INITIAL_DEMO_DATA: MediaItem[] = [
@@ -303,3 +341,111 @@ export async function deleteMediaItem(id: string): Promise<void> {
     window.dispatchEvent(new CustomEvent('local-media-updated', { detail: updated }));
   }
 }
+
+// ローカルログ操作ヘルパー
+function getLocalLogs(): MediaLog[] {
+  const raw = localStorage.getItem(STORAGE_KEY_LOCAL_LOGS);
+  if (!raw) {
+    localStorage.setItem(STORAGE_KEY_LOCAL_LOGS, JSON.stringify(INITIAL_DEMO_LOGS));
+    return INITIAL_DEMO_LOGS;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return INITIAL_DEMO_LOGS;
+  }
+}
+
+function saveLocalLogs(logs: MediaLog[]) {
+  localStorage.setItem(STORAGE_KEY_LOCAL_LOGS, JSON.stringify(logs));
+}
+
+// 履歴ログのサブスクライブ
+export function subscribeToLogs(
+  onData: (logs: MediaLog[]) => void,
+  onError: (err: Error) => void
+): Unsubscribe {
+  const { isFirebaseReady } = initFirebaseService();
+
+  if (isFirebaseReady && db) {
+    try {
+      const q = query(collection(db, 'media_logs'), orderBy('timestamp', 'desc'));
+      return onSnapshot(
+        q,
+        async (snapshot) => {
+          if (snapshot.empty) {
+            // Firestoreが空の場合、サンプル履歴を自動投入
+            try {
+              for (const log of INITIAL_DEMO_LOGS) {
+                if (db) {
+                  await setDoc(doc(db, 'media_logs', log.id), log);
+                }
+              }
+            } catch (seedErr) {
+              console.warn('Could not auto-seed demo logs', seedErr);
+            }
+            onData(INITIAL_DEMO_LOGS);
+            return;
+          }
+
+          const logs: MediaLog[] = [];
+          snapshot.forEach((docSnap) => {
+            logs.push({ id: docSnap.id, ...docSnap.data() } as MediaLog);
+          });
+          onData(logs);
+        },
+        (error) => {
+          console.error('Firestore logs listener error:', error);
+          onError(error);
+        }
+      );
+    } catch (e) {
+      console.warn('Falling back to local storage for logs', e);
+    }
+  }
+
+  // ローカルモード
+  const initial = getLocalLogs();
+  onData(initial);
+
+  const handleStorageChange = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY_LOCAL_LOGS && e.newValue) {
+      onData(JSON.parse(e.newValue));
+    }
+  };
+  window.addEventListener('storage', handleStorageChange);
+
+  const handleCustomEvent = (e: CustomEvent<MediaLog[]>) => {
+    onData(e.detail);
+  };
+  window.addEventListener('local-logs-updated' as any, handleCustomEvent);
+
+  return () => {
+    window.removeEventListener('storage', handleStorageChange);
+    window.removeEventListener('local-logs-updated' as any, handleCustomEvent);
+  };
+}
+
+// 履歴ログ追加
+export async function addMediaLog(logData: Omit<MediaLog, 'id' | 'timestamp'>): Promise<string> {
+  const { isFirebaseReady } = initFirebaseService();
+  const id = `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const newLog: MediaLog = {
+    ...logData,
+    id,
+    timestamp: Date.now(),
+  };
+
+  if (isFirebaseReady && db) {
+    const docRef = doc(db, 'media_logs', id);
+    await setDoc(docRef, newLog);
+    return id;
+  } else {
+    const logs = getLocalLogs();
+    const updated = [newLog, ...logs];
+    saveLocalLogs(updated);
+    window.dispatchEvent(new CustomEvent('local-logs-updated', { detail: updated }));
+    return id;
+  }
+}
+
