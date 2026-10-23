@@ -236,7 +236,7 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
                 type="date"
                 value={returnDueDate}
                 onChange={(e) => setReturnDueDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-hidden focus:border-indigo-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-hidden focus:border-indigo-500 dark:[color-scheme:dark]"
               />
             </div>
 
