@@ -37,11 +37,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
   if (!isOpen) return null;
 
-  // FirebaseコンソールのJavaScriptオブジェクトを直接貼り付けて自動パースする便利機能
   const handlePasteJson = (text: string) => {
     setRawConfigJson(text);
     try {
-      // apiKey: "...", 形式を検出
       const apiKeyMatch = text.match(/apiKey:\s*["']([^"']+)["']/);
       const authDomainMatch = text.match(/authDomain:\s*["']([^"']+)["']/);
       const projectIdMatch = text.match(/projectId:\s*["']([^"']+)["']/);
@@ -86,17 +84,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] text-slate-800 dark:text-slate-100">
         {/* ヘッダー */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-900/90">
-          <div className="flex items-center gap-2 text-white font-semibold text-base">
-            <Database className="w-5 h-5 text-indigo-400" />
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90">
+          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-base">
+            <Database className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
             <span>データベース（Firebase）設定</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -108,20 +106,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           <div
             className={`p-3.5 rounded-xl border flex items-center gap-3 ${
               isConnected
-                ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
-                : 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-300'
+                : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-500/40 text-amber-800 dark:text-amber-300'
             }`}
           >
             {isConnected ? (
-              <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
+              <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             ) : (
-              <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
             )}
             <div className="text-xs">
               <div className="font-bold">
                 {isConnected ? 'Firebase Cloud Firestore に接続中' : 'ローカルお試しモードで動作中'}
               </div>
-              <div className="text-slate-300 mt-0.5">
+              <div className="text-slate-600 dark:text-slate-300 mt-0.5">
                 {isConnected
                   ? 'サークル部員全員のPC・スマホ間でリアルタイム同期されています。'
                   : '端末内のブラウザにのみ保存されています。全員で共有するにはFirebaseの設定を入力してください。'}
@@ -130,8 +128,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
 
           {/* クイック貼り付け */}
-          <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Firebaseコンソールの設定コードをそのまま貼り付け
             </label>
             <textarea
@@ -139,14 +137,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               placeholder="const firebaseConfig = { apiKey: &quot;...&quot;, projectId: &quot;...&quot; }; を貼り付けると自動入力されます"
               value={rawConfigJson}
               onChange={(e) => handlePasteJson(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-xs font-mono focus:outline-none focus:border-indigo-500"
+              className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs font-mono focus:outline-hidden focus:border-indigo-500"
             />
           </div>
 
           {/* 詳細設定フォーム */}
           <form onSubmit={handleSave} className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                 API Key *
               </label>
               <input
@@ -155,13 +153,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="AIzaSy..."
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-hidden focus:border-indigo-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Project ID *
                 </label>
                 <input
@@ -170,12 +168,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   value={projectId}
                   onChange={(e) => setProjectId(e.target.value)}
                   placeholder="kendaitv-media"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Auth Domain
                 </label>
                 <input
@@ -183,14 +181,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   value={authDomain}
                   onChange={(e) => setAuthDomain(e.target.value)}
                   placeholder="project-id.firebaseapp.com"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Storage Bucket
                 </label>
                 <input
@@ -198,12 +196,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   value={storageBucket}
                   onChange={(e) => setStorageBucket(e.target.value)}
                   placeholder="project-id.appspot.com"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                   App ID
                 </label>
                 <input
@@ -211,7 +209,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   value={appId}
                   onChange={(e) => setAppId(e.target.value)}
                   placeholder="1:123456789:web:abcdef"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -220,7 +218,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <button
                 type="button"
                 onClick={handleResetToDemo}
-                className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1"
+                className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-500 flex items-center gap-1"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>ローカルモードに初期化</span>
@@ -228,7 +226,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-xs"
               >
                 <Save className="w-4 h-4" />
                 <span>保存して再読み込み</span>
@@ -237,19 +235,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </form>
 
           {/* かんたんセットアップ手順リンク */}
-          <div className="text-xs text-slate-400 bg-slate-950/50 p-3 rounded-xl border border-slate-800/80">
-            <div className="font-semibold text-slate-300 mb-1 flex items-center gap-1">
+          <div className="text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/50 p-3 rounded-xl border border-slate-200 dark:border-slate-800/80">
+            <div className="font-semibold text-slate-800 dark:text-slate-300 mb-1 flex items-center gap-1">
               <span>Firebaseの準備手順（完全無料）</span>
               <a
                 href="https://console.firebase.google.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-400 hover:underline inline-flex items-center gap-0.5 ml-1"
+                className="text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-0.5 ml-1"
               >
                 コンソール <ExternalLink className="w-3 h-3" />
               </a>
             </div>
-            <ol className="list-decimal list-inside space-y-0.5 text-[11px] text-slate-400">
+            <ol className="list-decimal list-inside space-y-0.5 text-[11px] text-slate-500 dark:text-slate-400">
               <li>Firebase Console で新規プロジェクトを作成</li>
               <li>左メニュー「Firestore Database」を作成（テストモードで開始）</li>
               <li>プロジェクト設定 ＞ マイアプリ で「ウェブ (&lt;/&gt;)」を追加</li>

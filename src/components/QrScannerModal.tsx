@@ -42,7 +42,6 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
           },
           (decodedText) => {
             if (isMounted) {
-              // 成功時
               html5QrCode.stop().then(() => {
                 onScanSuccess(decodedText);
               }).catch(() => {
@@ -50,9 +49,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
               });
             }
           },
-          () => {
-            // フレーム毎の読み取りエラーは無視
-          }
+          () => {}
         );
 
         if (isMounted) {
@@ -69,7 +66,6 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
       }
     };
 
-    // DOM要素のレンダリングを少し待ってから起動
     const timer = setTimeout(() => {
       startScanner();
     }, 150);
@@ -86,17 +82,17 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl flex flex-col text-slate-800 dark:text-slate-100">
         {/* ヘッダー */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-900/80">
-          <div className="flex items-center gap-2 text-white font-semibold text-lg">
-            <Camera className="w-5 h-5 text-indigo-400" />
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80">
+          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-lg">
+            <Camera className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
             <span>QRコードをスキャン</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -104,7 +100,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
         {/* スキャン画面 */}
         <div className="p-4 flex flex-col items-center">
-          <p className="text-xs text-slate-400 mb-3 text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 text-center">
             SDカードやSSDの管理QRコードを枠内に収めてください
           </p>
 
@@ -129,7 +125,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
           <div className="mt-4 w-full text-center">
             <button
               onClick={onClose}
-              className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition"
+              className="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition"
             >
               閉じる
             </button>
