@@ -99,11 +99,30 @@ export const INITIAL_DEMO_DATA: MediaItem[] = [
   }
 ];
 
+// デフォルトのFirebase接続設定（プロジェクト共通）
+export const DEFAULT_FIREBASE_CONFIG: FirebaseConfig = {
+  apiKey: "AIzaSyDiJYopMX9VpC5pfhJ1Tc8iRvlAbealLPc",
+  authDomain: "kendaitv-media-de0f4.firebaseapp.com",
+  projectId: "kendaitv-media-de0f4",
+  storageBucket: "kendaitv-media-de0f4.firebasestorage.app",
+  messagingSenderId: "679743661824",
+  appId: "1:679743661824:web:79d0dcb0f4016efb5375e5"
+};
+
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
 
-// Firebase設定の読み込み（.env または localStorage）
+// Firebase設定の読み込み（localStorage > .env > DEFAULT_CONFIG）
 export function getSavedFirebaseConfig(): FirebaseConfig | null {
+  const saved = localStorage.getItem(STORAGE_KEY_FIREBASE_CONFIG);
+  if (saved) {
+    try {
+      return JSON.parse(saved) as FirebaseConfig;
+    } catch {
+      // ignore
+    }
+  }
+
   const envConfig: FirebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
@@ -117,16 +136,7 @@ export function getSavedFirebaseConfig(): FirebaseConfig | null {
     return envConfig;
   }
 
-  const saved = localStorage.getItem(STORAGE_KEY_FIREBASE_CONFIG);
-  if (saved) {
-    try {
-      return JSON.parse(saved) as FirebaseConfig;
-    } catch {
-      return null;
-    }
-  }
-
-  return null;
+  return DEFAULT_FIREBASE_CONFIG;
 }
 
 export function saveFirebaseConfig(config: FirebaseConfig | null) {
@@ -189,7 +199,22 @@ export function subscribeToMedia(
       const q = query(collection(db, 'media'), orderBy('code', 'asc'));
       return onSnapshot(
         q,
-        (snapshot) => {
+        async (snapshot) => {
+          if (snapshot.empty) {
+            // Firestoreが空の場合、最初のサンプルデータを自動投入
+            try {
+              for (const item of INITIAL_DEMO_DATA) {
+                if (db) {
+                  await setDoc(doc(db, 'media', item.id), item);
+                }
+              }
+            } catch (seedErr) {
+              console.warn('Could not auto-seed demo data', seedErr);
+            }
+            onData(INITIAL_DEMO_DATA);
+            return;
+          }
+
           const items: MediaItem[] = [];
           snapshot.forEach((docSnap) => {
             items.push({ id: docSnap.id, ...docSnap.data() } as MediaItem);
