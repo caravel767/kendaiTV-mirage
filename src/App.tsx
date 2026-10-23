@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Aperture,
   Search,
@@ -13,7 +13,8 @@ import {
   WifiOff,
   Sun,
   Moon,
-  History
+  History,
+  Music
 } from 'lucide-react';
 import type { MediaItem, MediaLog } from './types/media';
 import {
@@ -36,7 +37,10 @@ import { HistoryModal } from './components/HistoryModal';
 import { SettingsModal } from './components/SettingsModal';
 
 export default function App() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, triggerMikuMode } = useTheme();
+  const [showMikuToast, setShowMikuToast] = useState(false);
+  const longPressTimerRef = useRef<number | null>(null);
+
   const [items, setItems] = useState<MediaItem[]>([]);
   const [logs, setLogs] = useState<MediaLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,6 +145,27 @@ export default function App() {
     return { total, available, borrowed, canFormat, doNotFormat };
   }, [items]);
 
+  // Mモード（初音ミク仕様）の発動ハンドラ
+  const handleMPointerDown = () => {
+    longPressTimerRef.current = window.setTimeout(() => {
+      triggerMikuMode();
+      setShowMikuToast(true);
+      setTimeout(() => setShowMikuToast(false), 3500);
+    }, 1200);
+  };
+
+  const handleMPointerUp = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+    }
+  };
+
+  const handleMDoubleClick = () => {
+    triggerMikuMode();
+    setShowMikuToast(true);
+    setTimeout(() => setShowMikuToast(false), 3500);
+  };
+
   // QRコードスキャン成功時
   const handleQrScanSuccess = (decodedText: string) => {
     setIsQrScanOpen(false);
@@ -162,14 +187,41 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
           {/* ロゴ・タイトル */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-sky-400 flex items-center justify-center shadow-lg shadow-indigo-500/25 ring-1 ring-white/20">
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 ring-1 ring-white/20 ${
+                theme === 'miku'
+                  ? 'bg-gradient-to-tr from-[#39C5BB] to-[#FF3399] shadow-[#39C5BB]/40 rotate-12'
+                  : 'bg-gradient-to-tr from-indigo-600 via-purple-600 to-sky-400 shadow-indigo-500/25'
+              }`}
+            >
               <Aperture className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="font-mirage text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-widest">
-                  MIRAGE
+              <div className="flex items-center gap-2">
+                <h1 className="font-mirage text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-widest select-none flex items-center">
+                  <span
+                    onPointerDown={handleMPointerDown}
+                    onPointerUp={handleMPointerUp}
+                    onPointerLeave={handleMPointerUp}
+                    onDoubleClick={handleMDoubleClick}
+                    className="cursor-pointer transition-transform hover:scale-110 hover:text-[#39C5BB] active:scale-95 inline-block"
+                    title="Mを長押しまたはダブルクリックで...？"
+                  >
+                    M
+                  </span>
+                  <span>IRAGE</span>
                 </h1>
+
+                {/* 初音ミク 01 タトゥーバッジ（Mモード時） */}
+                {theme === 'miku' && (
+                  <span
+                    className="miku-tattoo-badge text-[11px] px-1.5 py-0.2 rounded-xs select-none animate-pulse"
+                    title="初音ミク 01"
+                  >
+                    01
+                  </span>
+                )}
+
                 <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                   v1.0.0
                 </span>
@@ -195,7 +247,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-slate-500 dark:text-slate-400 hidden sm:block">
-                県大TV 機材・メディア管理システム
+                {theme === 'miku' ? 'MIRAGE - MIKU EDITION 39' : '県大TV 機材・メディア管理システム'}
               </p>
             </div>
           </div>
@@ -205,10 +257,26 @@ export default function App() {
             {/* テーマ切り替えボタン */}
             <button
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 transition"
+              title={
+                theme === 'miku'
+                  ? 'Mモード（初音ミク仕様）'
+                  : theme === 'dark'
+                  ? 'ライトモードに切り替え'
+                  : 'ダークモードに切り替え'
+              }
+              className={`p-2 rounded-xl text-xs border transition ${
+                theme === 'miku'
+                  ? 'bg-[#39C5BB]/15 text-[#39C5BB] border-[#39C5BB]/40 shadow-xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-700'
+              }`}
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+              {theme === 'miku' ? (
+                <Music className="w-4 h-4 text-[#FF3399]" />
+              ) : theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-700" />
+              )}
             </button>
 
             {/* 持ち出し履歴ボタン */}
@@ -255,7 +323,20 @@ export default function App() {
             </button>
           </div>
         </div>
+
+        {/* 鍵盤リボンモチーフ（Mモード時） */}
+        {theme === 'miku' && <div className="piano-keys-ribbon w-full transition-all" />}
       </header>
+
+      {/* Mモード起動トースト通知 */}
+      {showMikuToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#39C5BB] text-white px-5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2.5 border-2 border-white animate-bounce">
+          <Music className="w-5 h-5 text-[#FF3399]" />
+          <span className="font-bold text-sm tracking-wide">
+            {theme === 'miku' ? 'Mモード（初音ミク仕様）起動！ (39)' : '通常モードに戻りました'}
+          </span>
+        </div>
+      )}
 
       {/* メインコンテンツ */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">

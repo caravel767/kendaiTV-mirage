@@ -11,6 +11,7 @@ interface QrViewModalProps {
 
 export const QrViewModal: React.FC<QrViewModalProps> = ({ item, isOpen, onClose }) => {
   const [copied, setCopied] = React.useState(false);
+  const isMiku = typeof document !== 'undefined' && document.documentElement.classList.contains('miku-theme');
 
   if (!isOpen || !item) return null;
 
@@ -42,20 +43,40 @@ export const QrViewModal: React.FC<QrViewModalProps> = ({ item, isOpen, onClose 
 
         {/* ラベル表示領域（印刷対象） */}
         <div className="p-6 flex flex-col items-center bg-slate-100 dark:bg-slate-950/60 print:bg-white print:p-0">
-          <div className="bg-white p-5 rounded-2xl shadow-md border border-slate-200 text-slate-900 flex flex-col items-center max-w-[260px] w-full print:border-none print:shadow-none">
-            <div className="text-xs font-bold tracking-widest text-slate-500 uppercase mb-1">
-              MIRAGE • 県大TV
+          <div
+            className={`bg-white p-5 rounded-2xl shadow-md border text-slate-900 flex flex-col items-center max-w-[260px] w-full print:border-none print:shadow-none relative overflow-hidden ${
+              isMiku ? 'border-[#39C5BB] ring-1 ring-[#39C5BB]/40' : 'border-slate-200'
+            }`}
+          >
+            {/* 鍵盤アクセントライン（Mモード時） */}
+            {isMiku && <div className="piano-keys-ribbon w-full absolute top-0 left-0 right-0 h-1.5" />}
+
+            <div className="flex items-center justify-between w-full mb-1">
+              <div className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                {isMiku ? 'MIRAGE • #39 MIKU' : 'MIRAGE • 県大TV'}
+              </div>
+              {isMiku && (
+                <span className="miku-tattoo-badge text-[9px] px-1 py-0 rounded-xs font-black">
+                  01
+                </span>
+              )}
             </div>
+
             <div className="text-2xl font-black text-slate-900 tracking-tight mb-2">
               {item.code}
             </div>
 
-            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs mb-2">
+            <div
+              className={`bg-white p-2 rounded-xl border shadow-2xs mb-2 ${
+                isMiku ? 'border-[#39C5BB]/40' : 'border-slate-100'
+              }`}
+            >
               <QRCodeSVG
                 value={qrValue}
                 size={160}
                 level="M"
                 includeMargin={false}
+                fgColor={isMiku ? '#0f766e' : '#000000'}
               />
             </div>
 

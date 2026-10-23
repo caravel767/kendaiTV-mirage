@@ -4,6 +4,9 @@
 
 :root {
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --miku-green: #39C5BB;
+  --miku-pink: #FF3399;
+  --miku-dark: #1e293b;
 }
 
 .font-mirage {
@@ -16,6 +19,109 @@
   background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* 初音ミク風 鍵盤モチーフ（Piano Keys Ribbon） */
+.piano-keys-ribbon {
+  height: 6px;
+  background-color: #ffffff;
+  background-image: 
+    /* 黒鍵レイヤー */
+    linear-gradient(to right, 
+      #1e293b 0px, #1e293b 6px, transparent 6px, transparent 16px,
+      #1e293b 16px, #1e293b 22px, transparent 22px, transparent 40px,
+      #1e293b 40px, #1e293b 46px, transparent 46px, transparent 56px,
+      #1e293b 56px, #1e293b 62px, transparent 62px, transparent 72px,
+      #1e293b 72px, #1e293b 78px, transparent 78px, transparent 96px
+    ),
+    /* 白鍵の区切り線 */
+    repeating-linear-gradient(to right, #ffffff 0px, #ffffff 13px, #cbd5e1 13px, #cbd5e1 14px);
+  background-size: 96px 4px, 14px 6px;
+  background-repeat: repeat-x;
+  border-bottom: 1.5px solid #39C5BB;
+  box-shadow: 0 1px 4px rgba(57, 197, 187, 0.3);
+}
+
+/* Mモード適用時のカラーリングとアニメーション */
+.miku-theme body {
+  background-color: #f4fbfb !important;
+  color: #1e293b !important;
+}
+
+.miku-theme .bg-white {
+  background-color: #ffffff !important;
+  border-color: #d1fae5 !important;
+}
+
+/* プライマリボタン・アクション色（#39C5BB） */
+.miku-theme .bg-indigo-600 {
+  background-color: #39C5BB !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(57, 197, 187, 0.35) !important;
+}
+.miku-theme .hover\:bg-indigo-500:hover {
+  background-color: #2db3a9 !important;
+}
+.miku-theme .text-indigo-600,
+.miku-theme .text-indigo-500,
+.miku-theme .text-indigo-400 {
+  color: #0d9488 !important;
+}
+.miku-theme .border-indigo-500,
+.miku-theme .border-indigo-400 {
+  border-color: #39C5BB !important;
+}
+.miku-theme .bg-indigo-500\/10,
+.miku-theme .bg-indigo-500\/15,
+.miku-theme .bg-indigo-500\/20 {
+  background-color: rgba(57, 197, 187, 0.12) !important;
+  color: #0f766e !important;
+}
+
+/* アクセント色（#FF3399）：持ち出し中ステータス・警告 */
+.miku-theme .bg-indigo-50,
+.miku-theme .bg-indigo-50\/80 {
+  background-color: #fff1f7 !important;
+  border-color: #fbcfe8 !important;
+  color: #be185d !important;
+}
+.miku-theme .text-indigo-900,
+.miku-theme .text-indigo-700,
+.miku-theme .text-indigo-800 {
+  color: #be185d !important;
+}
+.miku-theme .bg-indigo-600.animate-ping {
+  background-color: #FF3399 !important;
+}
+.miku-theme .bg-indigo-100 {
+  background-color: #fce7f3 !important;
+  color: #be185d !important;
+}
+.miku-theme .text-rose-600 {
+  color: #FF3399 !important;
+}
+
+/* 鍵盤風の押し込みボタンエフェクト */
+.miku-theme button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.miku-theme .text-mirage-gradient {
+  background: linear-gradient(135deg, #39C5BB 0%, #06b6d4 50%, #FF3399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 01タトゥー風バッジ */
+.miku-tattoo-badge {
+  font-family: 'Cinzel', monospace, sans-serif;
+  color: #FF3399;
+  border: 1.5px solid #FF3399;
+  letter-spacing: 0.1em;
+  font-weight: 900;
+  text-shadow: 0 0 4px rgba(255, 51, 153, 0.4);
+  background: rgba(255, 51, 153, 0.08);
 }
 
 body {
@@ -36,11 +142,18 @@ body {
 .dark ::-webkit-scrollbar-track {
   background: #0f172a;
 }
+.miku-theme ::-webkit-scrollbar-track {
+  background: #e6f7f5;
+}
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
 .dark ::-webkit-scrollbar-thumb {
   background: #334155;
+  border-radius: 4px;
+}
+.miku-theme ::-webkit-scrollbar-thumb {
+  background: #39C5BB;
   border-radius: 4px;
 }
