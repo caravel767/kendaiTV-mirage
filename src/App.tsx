@@ -170,6 +170,9 @@ export default function App() {
                 <h1 className="font-mirage text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-widest">
                   MIRAGE
                 </h1>
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                  v1.0.0
+                </span>
                 <span
                   title={isFirebaseConnected ? 'Firebaseリアルタイム同期中' : 'ローカル保存モード'}
                   className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium border ${
@@ -439,7 +442,7 @@ export default function App() {
 
       {/* フッター */}
       <footer className="py-4 border-t border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-950 text-center text-xs text-slate-500">
-        <span className="font-mirage tracking-widest font-semibold mr-1">MIRAGE</span> • Media Management System for 県大TV
+        <span className="font-mirage tracking-widest font-semibold mr-1">MIRAGE</span> v1.0.0 • Media Management System for 県大TV
       </footer>
 
       {/* モーダル群 */}
