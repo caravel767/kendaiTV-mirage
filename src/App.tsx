@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
-  Film,
+  Aperture,
   Search,
   Plus,
   QrCode,
@@ -162,13 +162,13 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
           {/* ロゴ・タイトル */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Film className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-sky-400 flex items-center justify-center shadow-lg shadow-indigo-500/25 ring-1 ring-white/20">
+              <Aperture className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-                  県大TV メディア管理
+              <div className="flex items-center gap-2.5">
+                <h1 className="font-mirage text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-widest">
+                  MIRAGE
                 </h1>
                 <span
                   title={isFirebaseConnected ? 'Firebaseリアルタイム同期中' : 'ローカル保存モード'}
@@ -186,13 +186,13 @@ export default function App() {
                   ) : (
                     <>
                       <WifiOff className="w-3 h-3" />
-                      <span className="hidden sm:inline">ローカルモード</span>
+                      <span className="hidden sm:inline">ローカル</span>
                     </>
                   )}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-                SDカード・SSD持ち出し状況 &amp; 撮影データ管理システム
+              <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-slate-500 dark:text-slate-400 hidden sm:block">
+                県大TV 機材・メディア管理システム
               </p>
             </div>
           </div>
@@ -439,7 +439,7 @@ export default function App() {
 
       {/* フッター */}
       <footer className="py-4 border-t border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-950 text-center text-xs text-slate-500">
-        県大TV 機材管理システム • PWA &amp; Firestore 対応
+        <span className="font-mirage tracking-widest font-semibold mr-1">MIRAGE</span> • Media Management System for 県大TV
       </footer>
 
       {/* モーダル群 */}

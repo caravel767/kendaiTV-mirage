@@ -43,8 +43,8 @@ export const QrViewModal: React.FC<QrViewModalProps> = ({ item, isOpen, onClose 
         {/* ラベル表示領域（印刷対象） */}
         <div className="p-6 flex flex-col items-center bg-slate-100 dark:bg-slate-950/60 print:bg-white print:p-0">
           <div className="bg-white p-5 rounded-2xl shadow-md border border-slate-200 text-slate-900 flex flex-col items-center max-w-[260px] w-full print:border-none print:shadow-none">
-            <div className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-1">
-              県大TV 機材管理
+            <div className="text-xs font-bold tracking-widest text-slate-500 uppercase mb-1">
+              MIRAGE • 県大TV
             </div>
             <div className="text-2xl font-black text-slate-900 tracking-tight mb-2">
               {item.code}

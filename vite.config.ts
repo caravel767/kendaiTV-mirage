@@ -13,9 +13,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'app-icon.svg'],
       manifest: {
-        name: '県大TV メディア管理システム',
-        short_name: '県大TVメディア',
-        description: 'SDカード・SSD・HDDの機材持ち出し＆保存データ管理システム',
+        name: 'Mirage - メディア管理システム',
+        short_name: 'Mirage',
+        description: 'Mirage - 映像制作メディア持ち出し＆保存データ管理システム',
         theme_color: '#0b0f19',
         background_color: '#0b0f19',
         display: 'standalone',
