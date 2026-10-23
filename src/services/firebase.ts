@@ -430,8 +430,13 @@ export function subscribeToLogs(
 export async function addMediaLog(logData: Omit<MediaLog, 'id' | 'timestamp'>): Promise<string> {
   const { isFirebaseReady } = initFirebaseService();
   const id = `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  // Firestore rejects undefined values. Optional fields such as
+  // formattedOnReturn are undefined for borrow logs, so omit them entirely.
+  const definedLogData = Object.fromEntries(
+    Object.entries(logData).filter(([, value]) => value !== undefined)
+  ) as Omit<MediaLog, 'id' | 'timestamp'>;
   const newLog: MediaLog = {
-    ...logData,
+    ...definedLogData,
     id,
     timestamp: Date.now(),
   };
