@@ -32,16 +32,16 @@
 /* Cyan strap with the black alternating triangles from Miku's waist belt. */
 .miku-belt-ribbon {
   height: 10px;
-  background-color: #39C5BB;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' viewBox='0 0 40 10'%3E%3Cpath fill='%231e293b' d='M0 0h20L10 10zM20 10h20L30 0z'/%3E%3C/svg%3E");
-  background-size: 40px 10px;
+  background-color: #1e293b;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10'%3E%3Cpath fill='%2339C5BB' d='M0 0h20L10 10z'/%3E%3C/svg%3E");
+  background-size: 20px 10px;
   background-repeat: repeat-x;
   box-shadow: 0 1px 4px rgba(57, 197, 187, 0.3);
 }
 
 .miku-belt-ribbon--thin {
   height: 6px;
-  background-size: 24px 6px;
+  background-size: 12px 6px;
 }
 
 /* Mモード適用時のカラーリングとアニメーション */
@@ -101,6 +101,34 @@
 }
 .miku-theme .text-rose-600 {
   color: #FF3399 !important;
+}
+.miku-theme .text-fuchsia-700,
+.miku-theme .text-fuchsia-400 {
+  color: #FF3399 !important;
+}
+.miku-theme .bg-fuchsia-500\/10 {
+  background-color: rgba(255, 51, 153, 0.12) !important;
+}
+
+/* メディアカードに控えめなマゼンタの上端ラインを追加 */
+.miku-media-card {
+  position: relative;
+}
+.miku-theme .miku-media-card::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #FF3399;
+  pointer-events: none;
+}
+.miku-theme .miku-media-card:hover,
+.miku-theme .miku-media-card:focus-within {
+  border-color: #FF3399 !important;
+  box-shadow: 0 0 0 2px rgba(255, 51, 153, 0.16), 0 8px 20px rgba(255, 51, 153, 0.12) !important;
 }
 
 /* 鍵盤風の押し込みボタンエフェクト */

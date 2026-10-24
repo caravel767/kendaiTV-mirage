@@ -212,16 +212,6 @@ export default function App() {
                   <span>IRAGE</span>
                 </h1>
 
-                {/* 初音ミク 01 タトゥーバッジ（Mモード時） */}
-                {theme === 'miku' && (
-                  <span
-                    className="miku-tattoo-badge text-[11px] px-1.5 py-0.2 rounded-xs select-none animate-pulse"
-                    title="初音ミク 01"
-                  >
-                    01
-                  </span>
-                )}
-
                 {theme === 'miku' && (
                   <svg
                     className="miku-tie-mark"
@@ -374,7 +364,7 @@ export default function App() {
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
               <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">総メディア数</p>
-              <p className="text-2xl font-black text-indigo-700 dark:text-indigo-300 mt-1">{stats.total}</p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.total}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <HardDrive className="w-5 h-5" />
@@ -384,7 +374,7 @@ export default function App() {
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
               <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">初期化OK（空き）</p>
-              <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{stats.canFormat}</p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.canFormat}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <Sparkles className="w-5 h-5" />
@@ -393,20 +383,20 @@ export default function App() {
 
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
-              <p className="text-xs font-medium text-sky-600 dark:text-sky-400">部室に保管中</p>
-              <p className="text-2xl font-black text-sky-700 dark:text-sky-300 mt-1">{stats.available}</p>
+              <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">部室に保管中</p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.available}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-400">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
-              <p className="text-xs font-medium text-amber-600 dark:text-amber-400">貸出中</p>
-              <p className="text-2xl font-black text-amber-700 dark:text-amber-300 mt-1">{stats.borrowed}</p>
+              <p className="text-xs font-medium text-fuchsia-700 dark:text-fuchsia-400">貸出中</p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.borrowed}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <div className="w-10 h-10 rounded-xl bg-fuchsia-500/10 flex items-center justify-center text-fuchsia-700 dark:text-fuchsia-400">
               <Clock className="w-5 h-5" />
             </div>
           </div>

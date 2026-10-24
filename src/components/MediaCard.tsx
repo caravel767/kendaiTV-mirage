@@ -82,7 +82,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
 
   return (
     <div
-      className={`rounded-2xl border transition-all duration-200 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md flex flex-col justify-between overflow-hidden ${
+      className={`miku-media-card rounded-2xl border transition-all duration-200 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md flex flex-col justify-between overflow-hidden ${
         isBorrowed
           ? 'border-indigo-400 dark:border-indigo-500/40 hover:border-indigo-500'
           : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
