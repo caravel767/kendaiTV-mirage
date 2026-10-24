@@ -223,7 +223,7 @@ export default function App() {
                 )}
 
                 <span className="hidden sm:inline-flex text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                  v1.0.1
+                  v1.1.0
                 </span>
                 <span
                   title={isFirebaseConnected ? 'Firebaseリアルタイム同期中' : 'ローカル保存モード'}
@@ -248,7 +248,7 @@ export default function App() {
               </div>
               <div className="flex sm:hidden items-center gap-1.5 mt-1">
                 <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                  v1.0.1
+                  v1.1.0
                 </span>
                 <span
                   title={isFirebaseConnected ? 'Firebaseリアルタイム同期中' : 'ローカル保存モード'}
@@ -263,7 +263,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-slate-500 dark:text-slate-400 hidden sm:block">
-                {theme === 'miku' ? 'MIRAGE - MIKU EDITION 39' : '県大TV 機材・メディア管理システム'}
+                {theme === 'miku' ? 'MIRAGE - 39 STYLE' : '県大TV 機材・メディア管理システム'}
               </p>
             </div>
           </div>
@@ -349,7 +349,7 @@ export default function App() {
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#39C5BB] text-white px-5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2.5 border-2 border-white animate-bounce">
           <Music className="w-5 h-5 text-[#FF3399]" />
           <span className="font-bold text-sm tracking-wide">
-            {theme === 'miku' ? 'Mモード（初音ミク仕様）起動！ (39)' : '通常モードに戻りました'}
+            {theme === 'miku' ? 'Mモード 起動！' : '通常モードに戻りました'}
           </span>
         </div>
       )}
@@ -370,6 +370,16 @@ export default function App() {
 
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">初期化OK（空き）</p>
+              <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{stats.canFormat}</p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <Sparkles className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+            <div>
               <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">部室に保管中</p>
               <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.available}</p>
             </div>
@@ -385,16 +395,6 @@ export default function App() {
             </div>
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <Clock className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
-            <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">初期化OK（空き）</p>
-              <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{stats.canFormat}</p>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-              <Sparkles className="w-5 h-5" />
             </div>
           </div>
         </section>
@@ -425,7 +425,7 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs">
             {/* メディア種別タブ */}
             <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 max-w-full">
-              {['ALL', 'SD', 'MicroSD', 'CFexpress', 'SSD', 'HDD', 'USB'].map((type) => (
+              {['ALL', 'SD', 'MicroSD', 'CFexpress', 'SSD', 'HDD', 'USB', 'Other'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setSelectedType(type)}
@@ -435,7 +435,7 @@ export default function App() {
                       : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
                   }`}
                 >
-                  {type === 'ALL' ? '全メディア' : type}
+                  {type === 'ALL' ? '全メディア' : type === 'Other' ? 'その他' : type}
                 </button>
               ))}
             </div>
@@ -539,7 +539,7 @@ export default function App() {
 
       {/* フッター */}
       <footer className="py-4 border-t border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-950 text-center text-xs text-slate-500">
-        <span className="font-mirage tracking-widest font-semibold mr-1">MIRAGE</span> v1.0.1 • Media Management System for 県大TV
+        <span className="font-mirage tracking-widest font-semibold mr-1">MIRAGE</span> v1.1.0 • Media Management System for 県大TV
       </footer>
 
       {/* モーダル群 */}
