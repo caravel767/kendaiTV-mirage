@@ -21,25 +21,27 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* 初音ミク風 鍵盤モチーフ（Piano Keys Ribbon） */
-.piano-keys-ribbon {
-  height: 6px;
-  background-color: #ffffff;
-  background-image: 
-    /* 黒鍵レイヤー */
-    linear-gradient(to right, 
-      #1e293b 0px, #1e293b 6px, transparent 6px, transparent 16px,
-      #1e293b 16px, #1e293b 22px, transparent 22px, transparent 40px,
-      #1e293b 40px, #1e293b 46px, transparent 46px, transparent 56px,
-      #1e293b 56px, #1e293b 62px, transparent 62px, transparent 72px,
-      #1e293b 72px, #1e293b 78px, transparent 78px, transparent 96px
-    ),
-    /* 白鍵の区切り線 */
-    repeating-linear-gradient(to right, #ffffff 0px, #ffffff 13px, #cbd5e1 13px, #cbd5e1 14px);
-  background-size: 96px 4px, 14px 6px;
+/* Miku tie silhouette: aqua blade with the two dark bars near its tip. */
+.miku-tie-mark {
+  width: 14px;
+  height: 24px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.2));
+}
+
+/* Cyan strap with the black alternating triangles from Miku's waist belt. */
+.miku-belt-ribbon {
+  height: 10px;
+  background-color: #39C5BB;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' viewBox='0 0 40 10'%3E%3Cpath fill='%231e293b' d='M0 0h20L10 10zM20 10h20L30 0z'/%3E%3C/svg%3E");
+  background-size: 40px 10px;
   background-repeat: repeat-x;
-  border-bottom: 1.5px solid #39C5BB;
   box-shadow: 0 1px 4px rgba(57, 197, 187, 0.3);
+}
+
+.miku-belt-ribbon--thin {
+  height: 6px;
+  background-size: 24px 6px;
 }
 
 /* Mモード適用時のカラーリングとアニメーション */

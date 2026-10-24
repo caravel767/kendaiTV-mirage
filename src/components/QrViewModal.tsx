@@ -48,8 +48,8 @@ export const QrViewModal: React.FC<QrViewModalProps> = ({ item, isOpen, onClose 
               isMiku ? 'border-[#39C5BB] ring-1 ring-[#39C5BB]/40' : 'border-slate-200'
             }`}
           >
-            {/* 鍵盤アクセントライン（Mモード時） */}
-            {isMiku && <div className="piano-keys-ribbon w-full absolute top-0 left-0 right-0 h-1.5" />}
+            {/* 腰ベルトのアクセントライン（Mモード時） */}
+            {isMiku && <div className="miku-belt-ribbon miku-belt-ribbon--thin w-full absolute top-0 left-0 right-0" />}
 
             <div className="flex items-center justify-between w-full mb-1">
               <div className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">

@@ -222,6 +222,19 @@ export default function App() {
                   </span>
                 )}
 
+                {theme === 'miku' && (
+                  <svg
+                    className="miku-tie-mark"
+                    viewBox="0 0 24 40"
+                    role="img"
+                    aria-label="初音ミクのネクタイモチーフ"
+                  >
+                    <path d="M7 1 12 0 17 1 16 7 12 10 8 7Z" fill="#39C5BB" />
+                    <path d="M9 8 15 8 14 11 21 34 12 40 3 34 10 11Z" fill="#39C5BB" />
+                    <path d="m6 30 12 0M7 33l10 0" stroke="#1e293b" strokeWidth="1.8" />
+                  </svg>
+                )}
+
                 <span className="hidden sm:inline-flex text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                   v1.1.0
                 </span>
@@ -340,8 +353,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* 鍵盤リボンモチーフ（Mモード時） */}
-        {theme === 'miku' && <div className="piano-keys-ribbon w-full transition-all" />}
+        {/* 腰ベルトのジグザグモチーフ（Mモード時） */}
+        {theme === 'miku' && <div className="miku-belt-ribbon w-full transition-all" />}
       </header>
 
       {/* Mモード起動トースト通知 */}
@@ -360,8 +373,8 @@ export default function App() {
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">総メディア数</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.total}</p>
+              <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">総メディア数</p>
+              <p className="text-2xl font-black text-indigo-700 dark:text-indigo-300 mt-1">{stats.total}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <HardDrive className="w-5 h-5" />
@@ -370,7 +383,7 @@ export default function App() {
 
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">初期化OK（空き）</p>
+              <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">初期化OK（空き）</p>
               <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{stats.canFormat}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -380,20 +393,20 @@ export default function App() {
 
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
-              <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">部室に保管中</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.available}</p>
+              <p className="text-xs font-medium text-sky-600 dark:text-sky-400">部室に保管中</p>
+              <p className="text-2xl font-black text-sky-700 dark:text-sky-300 mt-1">{stats.available}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <div className="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-400">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
-              <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">貸出中</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.borrowed}</p>
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-400">貸出中</p>
+              <p className="text-2xl font-black text-amber-700 dark:text-amber-300 mt-1">{stats.borrowed}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
               <Clock className="w-5 h-5" />
             </div>
           </div>
