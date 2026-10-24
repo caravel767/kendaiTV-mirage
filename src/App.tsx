@@ -190,11 +190,20 @@ export default function App() {
             <div
               className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 ring-1 ring-white/20 ${
                 theme === 'miku'
-                  ? 'bg-gradient-to-tr from-[#39C5BB] to-[#FF3399] shadow-[#39C5BB]/40 rotate-12'
+                  ? 'bg-slate-950 shadow-[#39C5BB]/40'
                   : 'bg-gradient-to-tr from-indigo-600 via-purple-600 to-sky-400 shadow-indigo-500/25'
               }`}
             >
-              <Aperture className="w-5 h-5 text-white" />
+              {theme === 'miku' ? (
+                <svg className="miku-hair-ornament" viewBox="0 0 40 40" aria-label="Mモードの髪飾りモチーフ" role="img">
+                  <path d="M20 3 36 20 20 37 4 20 20 3Z" fill="none" stroke="#39C5BB" strokeWidth="5" strokeLinejoin="round" />
+                  <path d="M20 3 36 20 20 37 4 20 20 3Z" fill="none" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round" />
+                  <path d="M20 10 8 20 20 30Z M20 15 14 20 20 25Z" fill="#FF3399" fillRule="evenodd" />
+                  <path d="M20 10 32 20 20 30Z M20 15 26 20 20 25Z" fill="#39C5BB" fillRule="evenodd" />
+                </svg>
+              ) : (
+                <Aperture className="w-5 h-5 text-white" />
+              )}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">

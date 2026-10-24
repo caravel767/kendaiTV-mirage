@@ -29,6 +29,14 @@
   filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.2));
 }
 
+/* Miku's geometric hair ornament in the app mark. */
+.miku-hair-ornament {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 3px rgba(255, 51, 153, 0.45));
+}
+
 /* Cyan strap with the black alternating triangles from Miku's waist belt. */
 .miku-belt-ribbon {
   height: 10px;
@@ -110,20 +118,10 @@
   background-color: rgba(255, 51, 153, 0.12) !important;
 }
 
-/* メディアカードに控えめなマゼンタの上端ラインを追加 */
-.miku-media-card {
-  position: relative;
-}
-.miku-theme .miku-media-card::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #FF3399;
-  pointer-events: none;
+/* カード本体の上枠を使い、丸みに沿ったマゼンタラインにする */
+.miku-theme .miku-media-card {
+  border-top-width: 3px !important;
+  border-top-color: #FF3399 !important;
 }
 .miku-theme .miku-media-card:hover,
 .miku-theme .miku-media-card:focus-within {
