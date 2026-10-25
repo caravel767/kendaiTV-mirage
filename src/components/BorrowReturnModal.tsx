@@ -4,6 +4,7 @@ import type { MediaItem, FormatStatus } from '../types/media';
 
 interface BorrowReturnModalProps {
   item: MediaItem | null;
+  containedCards: MediaItem[];
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (
@@ -21,6 +22,7 @@ interface BorrowReturnModalProps {
 
 export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
   item,
+  containedCards,
   isOpen,
   onClose,
   onConfirm,
@@ -47,6 +49,10 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
   if (!isOpen || !item) return null;
 
   const isCurrentlyBorrowed = item.status === 'borrowed';
+  const isContainer = item.type === 'Camera' || item.type === 'Case';
+  const autoBorrowCards = containedCards.filter((card) => !card.excludeFromContainerBorrow && card.status === 'available');
+  const excludedCards = containedCards.filter((card) => card.excludeFromContainerBorrow);
+  const autoReturnCards = containedCards.filter((card) => card.borrowedWithContainerId === item.id);
 
   const handleBorrowSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +100,10 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
         borrowDate: '',
         returnDueDate: '',
       };
+
+      if (item.borrowedWithContainerId) updates.borrowedWithContainerId = '';
+
+      if (isContainer) updates.project = '';
 
       if (isFormattingOnReturn) {
         updates.formatStatus = 'can_format';
@@ -162,7 +172,13 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
               )}
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-start gap-3">
+            {item.borrowedWithContainerId && (
+              <div className="bg-amber-50 dark:bg-amber-950/30 p-3 rounded-xl border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200">
+                このカードだけを個別返却します。収納先のケース／カメラは貸出中のままです。
+              </div>
+            )}
+
+            {!isContainer && <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-start gap-3">
               <input
                 id="formatReturnCheck"
                 type="checkbox"
@@ -174,7 +190,13 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
                 <span className="font-semibold block text-emerald-600 dark:text-emerald-400">フォーマットして返却する</span>
                 メディア内のデータをすべて消去・初期化して返却する場合はチェックを入れてください。（ステータスが「🟢初期化OK」に更新されます）
               </label>
-            </div>
+            </div>}
+
+            {isContainer && autoReturnCards.length > 0 && (
+              <div className="bg-cyan-50 dark:bg-cyan-950/30 p-3 rounded-xl border border-cyan-200 dark:border-cyan-800 text-xs text-cyan-900 dark:text-cyan-200">
+                この機材と連動して貸出中のSD／MicroSD {autoReturnCards.length}枚も一緒に返却します。
+              </div>
+            )}
 
             <div className="flex gap-2 pt-2">
               <button
@@ -198,6 +220,16 @@ export const BorrowReturnModal: React.FC<BorrowReturnModalProps> = ({
         ) : (
           /* 部室にある時の持ち出しフロー */
           <form onSubmit={handleBorrowSubmit} className="p-5 flex flex-col gap-4">
+            {isContainer && containedCards.length > 0 && (
+              <div className="bg-cyan-50 dark:bg-cyan-950/30 p-3 rounded-xl border border-cyan-200 dark:border-cyan-800 text-xs text-cyan-900 dark:text-cyan-200">
+                <p className="font-semibold">収納中のカードの貸出連動</p>
+                <p className="mt-1">貸出可能なカード {autoBorrowCards.length}枚を同じ借主・企画で自動的に貸出中にします。</p>
+                {excludedCards.length > 0 && <p className="mt-1">連動対象外: {excludedCards.map((card) => card.code).join('、')}</p>}
+                {containedCards.some((card) => !card.excludeFromContainerBorrow && card.status === 'borrowed') && (
+                  <p className="mt-1">個別に貸出中のカードは状態を変更しません。</p>
+                )}
+              </div>
+            )}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 <User className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />

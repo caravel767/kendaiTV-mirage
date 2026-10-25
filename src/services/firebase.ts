@@ -6,6 +6,7 @@ import {
   setDoc,
   deleteDoc,
   updateDoc,
+  writeBatch,
   onSnapshot,
   query,
   orderBy,
@@ -452,5 +453,45 @@ export async function addMediaLog(logData: Omit<MediaLog, 'id' | 'timestamp'>): 
     window.dispatchEvent(new CustomEvent('local-logs-updated', { detail: updated }));
     return id;
   }
+}
+
+// 複数機材の貸出状態と履歴をまとめて保存（ケース／カメラと収納カードの連動用）
+export async function updateMediaItemsWithLogs(
+  itemUpdates: { id: string; updates: Partial<MediaItem> }[],
+  logEntries: Omit<MediaLog, 'id' | 'timestamp'>[]
+): Promise<void> {
+  const { isFirebaseReady } = initFirebaseService();
+  const timestamp = Date.now();
+  const newLogs: MediaLog[] = logEntries.map((entry, index) => {
+    const definedEntry = Object.fromEntries(
+      Object.entries(entry).filter(([, value]) => value !== undefined)
+    ) as Omit<MediaLog, 'id' | 'timestamp'>;
+    return {
+      ...definedEntry,
+      id: `log_${timestamp}_${index}_${Math.random().toString(36).substring(2, 7)}`,
+      timestamp: timestamp + index,
+    };
+  });
+
+  if (isFirebaseReady && db) {
+    const batch = writeBatch(db);
+    itemUpdates.forEach(({ id, updates }) => {
+      batch.update(doc(db!, 'media', id), { ...updates, updatedAt: timestamp });
+    });
+    newLogs.forEach((log) => batch.set(doc(db!, 'media_logs', log.id), log));
+    await batch.commit();
+    return;
+  }
+
+  const currentItems = getLocalMedia();
+  const updatedItems = currentItems.map((item) => {
+    const update = itemUpdates.find((entry) => entry.id === item.id);
+    return update ? { ...item, ...update.updates, updatedAt: timestamp } : item;
+  });
+  const updatedLogs = [...newLogs, ...getLocalLogs()];
+  saveLocalMedia(updatedItems);
+  saveLocalLogs(updatedLogs);
+  window.dispatchEvent(new CustomEvent('local-media-updated', { detail: updatedItems }));
+  window.dispatchEvent(new CustomEvent('local-logs-updated', { detail: updatedLogs }));
 }
 

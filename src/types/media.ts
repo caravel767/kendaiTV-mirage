@@ -1,4 +1,4 @@
-export type MediaType = 'SD' | 'MicroSD' | 'CFexpress' | 'SSD' | 'HDD' | 'USB' | 'Other';
+export type MediaType = 'SD' | 'MicroSD' | 'CFexpress' | 'SSD' | 'HDD' | 'USB' | 'Other' | 'Camera' | 'Case';
 
 export type FormatStatus = 'can_format' | 'needs_check' | 'do_not_format';
 
@@ -10,6 +10,9 @@ export interface MediaItem {
   capacity: string; // 容量 (例: "128GB", "1TB")
   speedClass?: string; // 規格・速度 (例: "V90 UHS-II", "1050MB/s")
   tags?: string[]; // 用途・機材タグ (例: ["α7SIII対応", "FX3用"])
+  containerId?: string; // SD/MicroSDの収納先（ケースまたはカメラ）
+  excludeFromContainerBorrow?: boolean; // 収納先の貸出時に連動させない
+  borrowedWithContainerId?: string; // 収納先の貸出に連動して貸出中
   status: 'available' | 'borrowed'; // 部室にあるか / 持ち出し中か
   borrower?: string; // 借りている部員名
   borrowDate?: string; // 持ち出し日時

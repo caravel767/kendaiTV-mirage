@@ -11,12 +11,15 @@ import {
   LogOut,
   RotateCcw,
   Tag,
-  History
+  History,
+  Camera,
+  Package
 } from 'lucide-react';
 import type { MediaItem, MediaType, FormatStatus } from '../types/media';
 
 interface MediaCardProps {
   item: MediaItem;
+  items: MediaItem[];
   onOpenBorrowReturn: (item: MediaItem) => void;
   onOpenContentEdit: (item: MediaItem) => void;
   onOpenQrView: (item: MediaItem) => void;
@@ -26,6 +29,7 @@ interface MediaCardProps {
 
 export const MediaCard: React.FC<MediaCardProps> = ({
   item,
+  items,
   onOpenBorrowReturn,
   onOpenContentEdit,
   onOpenQrView,
@@ -45,6 +49,10 @@ export const MediaCard: React.FC<MediaCardProps> = ({
         return { label: 'HDD', color: 'bg-amber-500/10 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20 dark:border-amber-500/30' };
       case 'USB':
         return { label: 'USB', color: 'bg-teal-500/10 dark:bg-teal-500/15 text-teal-600 dark:text-teal-400 border-teal-500/20 dark:border-teal-500/30' };
+      case 'Camera':
+        return { label: 'カメラ', color: 'bg-cyan-500/10 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/20 dark:border-cyan-500/30' };
+      case 'Case':
+        return { label: 'カードケース', color: 'bg-violet-500/10 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/20 dark:border-violet-500/30' };
       default:
         return { label: type, color: 'bg-slate-500/10 dark:bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/20 dark:border-slate-500/30' };
     }
@@ -78,6 +86,10 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   };
 
   const isBorrowed = item.status === 'borrowed';
+  const isContainer = item.type === 'Camera' || item.type === 'Case';
+  const isStorageCard = item.type === 'SD' || item.type === 'MicroSD';
+  const storageContainer = items.find((candidate) => candidate.id === item.containerId);
+  const containedCards = isContainer ? items.filter((candidate) => candidate.containerId === item.id) : [];
   const typeBadge = getTypeBadge(item.type);
 
   return (
@@ -100,10 +112,10 @@ export const MediaCard: React.FC<MediaCardProps> = ({
             >
               {typeBadge.label}
             </span>
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+            {!isContainer && <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
               {item.capacity}
-            </span>
-            {item.speedClass && (
+            </span>}
+            {!isContainer && item.speedClass && (
               <span className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/60 px-1.5 py-0.5 rounded">
                 {item.speedClass}
               </span>
@@ -111,7 +123,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           </div>
 
           {/* 初期化ステータス */}
-          <div>{getFormatBadge(item.formatStatus)}</div>
+          {!isContainer && <div>{getFormatBadge(item.formatStatus)}</div>}
         </div>
 
         {/* メディア名 */}
@@ -168,8 +180,45 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           )}
         </div>
 
+        {isStorageCard && storageContainer && (
+          <div className="flex items-center flex-wrap gap-1.5 text-[11px] text-slate-600 dark:text-slate-300">
+            {storageContainer.type === 'Camera' ? <Camera className="w-3.5 h-3.5 text-cyan-600" /> : <Package className="w-3.5 h-3.5 text-violet-600" />}
+            <span>収納先: {storageContainer.code} {storageContainer.name}</span>
+            <span className={`px-1.5 py-0.5 rounded-md ${storageContainer.status === 'borrowed' ? 'bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300' : 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'}`}>
+              {storageContainer.status === 'borrowed' ? `貸出中${storageContainer.borrower ? `・${storageContainer.borrower}` : ''}` : '部室内'}
+            </span>
+            {storageContainer.status === 'borrowed' && item.status === 'available' && !item.excludeFromContainerBorrow && (
+              <span className="text-emerald-700 dark:text-emerald-300">このカードは個別返却済み</span>
+            )}
+            {item.excludeFromContainerBorrow && <span className="text-rose-600 dark:text-rose-400">このカードは連動対象外</span>}
+          </div>
+        )}
+
+        {isContainer && (
+          <div className="bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">
+              {item.type === 'Camera' ? <Camera className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
+              収納中のSD／MicroSD（{containedCards.length}枚）
+            </div>
+            {containedCards.length > 0 ? (
+              <div className="flex flex-col gap-1.5">
+                {containedCards.map((card) => (
+                  <div key={card.id} className="flex items-center justify-between gap-2 text-[11px]">
+                    <span className="truncate text-slate-700 dark:text-slate-200">{card.code} · {card.name}</span>
+                    <span className={`shrink-0 ${card.borrowedWithContainerId === item.id || card.status === 'borrowed' ? 'text-amber-600 dark:text-amber-400' : card.excludeFromContainerBorrow ? 'text-slate-500' : item.status === 'borrowed' ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                      {card.borrowedWithContainerId === item.id ? '連動貸出中' : card.excludeFromContainerBorrow ? '連動対象外' : card.status === 'borrowed' ? '個別貸出中' : item.status === 'borrowed' ? '個別返却済み' : '連動対象'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">収納先に登録されたカードはありません。</p>
+            )}
+          </div>
+        )}
+
         {/* 保存データの内容（文字入力された詳細） */}
-        <div className="bg-slate-50 dark:bg-slate-950/70 p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-1">
+        {!isContainer && <div className="bg-slate-50 dark:bg-slate-950/70 p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-1">
           <div className="flex items-center justify-between text-xs">
             <span className="font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <FileText className="w-3.5 h-3.5" />
@@ -185,7 +234,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           <div className="text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap font-mono line-clamp-3 bg-white dark:bg-slate-900/50 p-2 rounded-lg border border-slate-200 dark:border-slate-800/50">
             {item.contentDescription || '（保存データ情報なし）'}
           </div>
-        </div>
+        </div>}
 
         {/* タグ一覧 */}
         {item.tags && item.tags.length > 0 && (
@@ -241,7 +290,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
           {isBorrowed ? (
             <>
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>返却する</span>
+              <span>{item.borrowedWithContainerId ? '個別返却' : '返却する'}</span>
             </>
           ) : (
             <>

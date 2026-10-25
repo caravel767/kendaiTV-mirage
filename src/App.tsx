@@ -23,7 +23,7 @@ import {
   addMediaItem,
   updateMediaItem,
   deleteMediaItem,
-  addMediaLog,
+  updateMediaItemsWithLogs,
   initFirebaseService
 } from './services/firebase';
 import { useTheme } from './hooks/useTheme';
@@ -136,7 +136,7 @@ export default function App() {
         return false;
       }
 
-      if (selectedFormat !== 'ALL' && item.formatStatus !== selectedFormat) {
+      if (selectedFormat !== 'ALL' && ((item.type === 'Camera' || item.type === 'Case') || item.formatStatus !== selectedFormat)) {
         return false;
       }
 
@@ -149,8 +149,9 @@ export default function App() {
     const total = items.length;
     const available = items.filter((i) => i.status === 'available').length;
     const borrowed = items.filter((i) => i.status === 'borrowed').length;
-    const canFormat = items.filter((i) => i.formatStatus === 'can_format').length;
-    const doNotFormat = items.filter((i) => i.formatStatus === 'do_not_format').length;
+    const mediaItems = items.filter((i) => i.type !== 'Camera' && i.type !== 'Case');
+    const canFormat = mediaItems.filter((i) => i.formatStatus === 'can_format').length;
+    const doNotFormat = mediaItems.filter((i) => i.formatStatus === 'do_not_format').length;
     return { total, available, borrowed, canFormat, doNotFormat };
   }, [items]);
 
@@ -373,7 +374,7 @@ export default function App() {
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
-              <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">総メディア数</p>
+              <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">総登録機材数</p>
               <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.total}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -438,7 +439,7 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs">
             {/* メディア種別タブ */}
             <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 max-w-full">
-              {['ALL', 'SD', 'MicroSD', 'CFexpress', 'SSD', 'HDD', 'USB', 'Other'].map((type) => (
+              {['ALL', 'SD', 'MicroSD', 'CFexpress', 'SSD', 'HDD', 'USB', 'Other', 'Camera', 'Case'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setSelectedType(type)}
@@ -448,7 +449,7 @@ export default function App() {
                       : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
                   }`}
                 >
-                  {type === 'ALL' ? '全メディア' : type === 'Other' ? 'その他' : type}
+                  {type === 'ALL' ? 'すべて' : type === 'Other' ? 'その他' : type === 'Camera' ? 'カメラ' : type === 'Case' ? 'カードケース' : type}
                 </button>
               ))}
             </div>
@@ -523,6 +524,7 @@ export default function App() {
                 <MediaCard
                   key={item.id}
                   item={item}
+                  items={items}
                   onOpenBorrowReturn={(target) => {
                     setSelectedBorrowItem(target);
                     setIsBorrowModalOpen(true);
@@ -558,25 +560,85 @@ export default function App() {
       {/* モーダル群 */}
       <BorrowReturnModal
         item={selectedBorrowItem}
+        containedCards={items.filter((candidate) => candidate.containerId === selectedBorrowItem?.id && (candidate.type === 'SD' || candidate.type === 'MicroSD'))}
         isOpen={isBorrowModalOpen}
         onClose={() => {
           setIsBorrowModalOpen(false);
           setSelectedBorrowItem(null);
         }}
         onConfirm={async (id, updates, logData) => {
-          await updateMediaItem(id, updates);
-          if (selectedBorrowItem) {
-            await addMediaLog({
-              mediaId: id,
-              mediaCode: selectedBorrowItem.code,
-              mediaName: selectedBorrowItem.name,
-              action: logData.action,
-              borrower: logData.borrower,
-              project: logData.project,
-              returnDueDate: logData.returnDueDate,
-              formattedOnReturn: logData.formattedOnReturn,
+          const target = items.find((candidate) => candidate.id === id);
+          if (!target) throw new Error('対象機材が見つかりません');
+
+          const itemUpdates = [{ id, updates }];
+          const logEntries: Omit<MediaLog, 'id' | 'timestamp'>[] = [{
+            mediaId: id,
+            mediaCode: target.code,
+            mediaName: target.name,
+            action: logData.action,
+            borrower: logData.borrower,
+            project: logData.project,
+            returnDueDate: logData.returnDueDate,
+            formattedOnReturn: logData.formattedOnReturn,
+          }];
+          const isContainer = target.type === 'Camera' || target.type === 'Case';
+
+          if (isContainer && logData.action === 'borrow') {
+            const linkedCards = items.filter((candidate) =>
+              candidate.containerId === id &&
+              (candidate.type === 'SD' || candidate.type === 'MicroSD') &&
+              candidate.status === 'available' &&
+              !candidate.excludeFromContainerBorrow
+            );
+            linkedCards.forEach((card) => {
+              itemUpdates.push({
+                id: card.id,
+                updates: {
+                  status: 'borrowed',
+                  borrower: logData.borrower,
+                  borrowDate: updates.borrowDate || new Date().toISOString().split('T')[0],
+                  returnDueDate: logData.returnDueDate || '',
+                  project: logData.project || '',
+                  borrowedWithContainerId: id,
+                },
+              });
+              logEntries.push({
+                mediaId: card.id,
+                mediaCode: card.code,
+                mediaName: card.name,
+                action: 'borrow',
+                borrower: logData.borrower,
+                project: logData.project,
+                returnDueDate: logData.returnDueDate,
+              });
+            });
+          } else if (isContainer && logData.action === 'return') {
+            const linkedCards = items.filter((candidate) => candidate.borrowedWithContainerId === id);
+            linkedCards.forEach((card) => {
+              itemUpdates.push({
+                id: card.id,
+                updates: {
+                  status: 'available',
+                  borrower: '',
+                  borrowDate: '',
+                  returnDueDate: '',
+                  project: '',
+                  borrowedWithContainerId: '',
+                },
+              });
+              logEntries.push({
+                mediaId: card.id,
+                mediaCode: card.code,
+                mediaName: card.name,
+                action: 'return',
+                borrower: logData.borrower,
+                project: logData.project,
+                formattedOnReturn: false,
+              });
             });
           }
+
+          await updateMediaItemsWithLogs(itemUpdates, logEntries);
         }}
       />
 
@@ -594,6 +656,7 @@ export default function App() {
 
       <MediaItemModal
         item={selectedEditItem}
+        items={items}
         isOpen={isMediaModalOpen}
         onClose={() => {
           setIsMediaModalOpen(false);
@@ -607,6 +670,9 @@ export default function App() {
           }
         }}
         onDelete={async (id) => {
+          if (items.some((candidate) => candidate.containerId === id)) {
+            throw new Error('収納中のSD/MicroSDがあるため、先に収納先を変更してください。');
+          }
           await deleteMediaItem(id);
         }}
       />
